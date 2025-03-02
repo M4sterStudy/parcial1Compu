@@ -61,22 +61,7 @@ services:
     networks:
       - mynetwork
 
-  # Microservicio de ordenes
-  #microusers:
-    #build: ./microOrders
-    #container_name: microorders
-    #restart: always
-    #depends_on:
-      #- db
-      #- consul
-    #ports:
-      #- "5004:5004"
-    #environment:
-      #- DATABASE_URL=mysql://root:root@db/myflaskapp
-      #- CONSUL_HOST=consul
-      #- CONSUL_PORT=8500
-    #networks:
-      #- mynetwork
+  i
 
   # Frontend con Flask
   frontend:

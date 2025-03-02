@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Management</title>
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  />
+  <style>
+    body {
+      padding-top: 50px;
+      padding-bottom: 20px;
+    }
+    .navbar {
+      margin-bottom: 20px;
+    }
+    .form-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="/">Store Management</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarCollapse"
+      aria-controls="navbarCollapse"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/products">Product Management</a></li>
+        <li class="nav-item"><a class="nav-link" href="/users">User Management</a></li>
+        <li class="nav-item active"><a class="nav-link" href="/orders">Orders Management</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="form-container">
+      <h2>Add New Order</h2>
+      <form id="add-order-form">
+        <div class="form-group">
+          <label for="ouser">User</label>
+          <input type="text" class="form-control" id="ouser" required />
+        </div>
+        <div class="form-group">
+          <label for="oproduct">Select Product</label>
+          <select id="oproduct" class="form-control" required></select>
+        </div>
+        <div class="form-group">
+          <label for="oproductsQty">Quantity</label>
+          <input type="number" class="form-control" id="oproductsQty" required min="1" value="1" />
+        </div>
+        <div class="form-group">
+          <label for="ototal">Total Price</label>
+          <input type="number" step="0.01" class="form-control" id="ototal" readonly />
+        </div>
+        <button type="button" onclick="createOrder()" class="btn btn-success">
+          Create Order
+        </button>
+      </form>
+    </div>
+
+    <h2>Orders List</h2>
+    <table id="order-list" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>User</th>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Total ($)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" onclick="getOrders()" class="btn btn-primary">
+      Get Orders
+    </button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchProducts();
+      document.getElementById("oproductsQty").addEventListener("input", updateTotalPrice);
+      document.getElementById("oproduct").addEventListener("change", updateTotalPrice);
+    });
+
+    async function fetchProducts() {
+      const response = await fetch("/api/products"); // 🔥 API para obtener productos
+      const products = await response.json();
+      const productSelect = document.getElementById("oproduct");
+
+      productSelect.innerHTML = '<option value="">Select a product</option>';
+      products.forEach((product) => {
+        const option = document.createElement("option");
+        option.value = product.id;
+        option.dataset.price = product.price; // Guardamos el precio en el dataset
+        option.textContent = `${product.name} - $${product.price}`;
+        productSelect.appendChild(option);
+      });
+    }
+
+    function updateTotalPrice() {
+      const productSelect = document.getElementById("oproduct");
+      const quantity = document.getElementById("oproductsQty").value;
+      const price = productSelect.options[productSelect.selectedIndex]?.dataset.price || 0;
+      document.getElementById("ototal").value = (quantity * price).toFixed(2);
+    }
+
+    async function createOrder() {
+      const user = document.getElementById("ouser").value;
+      const productSelect = document.getElementById("oproduct");
+      const quantity = document.getElementById("oproductsQty").value;
+
+      if (!productSelect.value) {
+        alert("Please select a product.");
+        return;
+      }
+
+      const selectedProduct = {
+        id: productSelect.value,
+        name: productSelect.options[productSelect.selectedIndex].text.split(" - $")[0],
+        price: parseFloat(productSelect.options[productSelect.selectedIndex].dataset.price),
+        quantity: parseInt(quantity),
+      };
+
+      const totalPrice = selectedProduct.price * selectedProduct.quantity;
+
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: user,
+          product_id: selectedProduct.id,
+          quantity: selectedProduct.quantity,
+          price: totalPrice,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Order created successfully");
+        getOrders();
+      } else {
+        alert("Error creating order");
+      }
+    }
+
+    async function getOrders() {
+      const response = await fetch("/api/orders");
+      const orders = await response.json();
+      const orderList = document.getElementById("order-list").querySelector("tbody");
+      orderList.innerHTML = "";
+
+      orders.forEach((order) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.user}</td>
+          <td>${order.product_name}</td>
+          <td>${order.quantity}</td>
+          <td>$${order.price.toFixed(2)}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteOrder(${order.id})">Delete</button>
+          </td>
+        `;
+        orderList.appendChild(row);
+      });
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm("Are you sure you want to delete this order?")) return;
+
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert("Order deleted successfully");
+        getOrders();
+      } else {
+        alert("Error deleting order");
+      }
+    }
+  </script>
+</body>
+</html>

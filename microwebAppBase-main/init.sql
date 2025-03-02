@@ -25,3 +25,18 @@ VALUES
 ('Laptop', 'Laptop de gama media', 650.99),
 ('Smartphone', 'Smartphone Android', 299.50),
 ('Auriculares', 'Auriculares Bluetooth', 45.00);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    price FLOAT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1
+);
+
+
+INSERT INTO orders (name, description, price, quantity)
+VALUES
+    ('Pedido 1', 'Primer pedido', 150.75, 2),
+    ('Pedido 2', 'Segundo pedido', 300.00, 1),
+    ('Pedido 3', 'Tercer pedido', 99.99, 5);

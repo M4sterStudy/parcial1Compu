@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/frontend",       "/home/vagrant/microwebAppBase-main/frontend"
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/microUsers",     "/home/vagrant/microwebAppBase-main/microUsers"
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/microProducts",  "/home/vagrant/microwebAppBase-main/microProducts"
-    #servidorUbuntu.vm.synced_folder "microwebAppBase-main/microOrders",   "/home/vagrant/microwebAppBase-main/microOrders"
+    servidorUbuntu.vm.synced_folder "microwebAppBase-main/microOrders",   "/home/vagrant/microwebAppBase-main/microOrders"
     #servidorUbuntu.vm.synced_folder "microwebAppBase-main/init.sql",      "/home/vagrant/microwebAppBase-main/init.sql"
   end
 end

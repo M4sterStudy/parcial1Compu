@@ -28,6 +28,14 @@ def products():
 def edit_product(id):
     return render_template('editProduct.html', id=id)
 
+@app.route('/orders')
+def orders():
+    return render_template('orders.html')
+
+@app.route('/editOrder/<string:id>')
+def edit_order(id):
+    return render_template('editOrder.html', id=id)
+
 from flask import Flask, request, jsonify
 
 from flask import Flask, jsonify
