@@ -1,0 +1,7 @@
+Flask
+pymysql
+flask_cors
+flask_consulate
+six
+flask_sqlalchemy
+mysqlclient
