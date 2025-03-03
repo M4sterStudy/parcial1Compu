@@ -13,7 +13,7 @@ def get_products():
         result.append({
             'id': product.id,
             'name': product.name,
-            'description': product.description,
+            'amount': product.amount,  # Se mantiene 'amount'
             'price': product.price
         })
     return jsonify(result)
@@ -24,7 +24,7 @@ def get_product(product_id):
     return jsonify({
         'id': product.id,
         'name': product.name,
-        'description': product.description,
+        'amount': product.amount,  # Se mantiene 'amount'
         'price': product.price
     })
 
@@ -33,20 +33,20 @@ def create_product():
     data = request.json
     new_product = Product(
         name=data['name'],
-        description=data.get('description', ''), 
-        price=data['price']
+        amount=data.get('amount', 0),  # Si no se envía amount, se asigna 0 por defecto
+        price=float(data['price'])
     )
     db.session.add(new_product)
     db.session.commit()
-    return jsonify({'message': 'Product created successfully'}), 201
+    return jsonify({'message': 'Product created successfully', 'product_id': new_product.id}), 201
 
 @product_controller.route('/api/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
     product = Product.query.get_or_404(product_id)
     data = request.json
     product.name = data['name']
-    product.description = data.get('description', '')
-    product.price = data['price']
+    product.amount = data.get('amount', product.amount)  # Se actualiza 'amount' si se envía
+    product.price = float(data['price'])
     db.session.commit()
     return jsonify({'message': 'Product updated successfully'})
 

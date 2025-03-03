@@ -1,17 +1,17 @@
-# microProducts/products/models/product_model.py
+# microOrders/orders/models/order_model.py
 from db.db import db
+from datetime import datetime
 
 class Order(db.Model):
     __tablename__ = 'orders' 
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False, default=1) 
+    username = db.Column(db.String(100), nullable=False)  # Usuario que realizó la orden
+    email = db.Column(db.String(255), nullable=False)  # Email del usuario
+    saleTotal = db.Column(db.Float, nullable=False)  # Total de la venta
+    date = db.Column(db.DateTime, default=datetime.utcnow)  # Fecha y hora de la orden
 
-    def __init__(self, name, description, price, quantity=1):
-        self.name = name
-        self.description = description
-        self.price = price
-        self.quantity = quantity 
+    def __init__(self, username, email, saleTotal):
+        self.username = username
+        self.email = email
+        self.saleTotal = saleTotal

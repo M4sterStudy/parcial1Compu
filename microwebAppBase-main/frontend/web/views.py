@@ -32,6 +32,10 @@ def edit_product(id):
 def orders():
     return render_template('orders.html')
 
+@app.route('/ordersDetails')
+def ordersDetials():
+    return render_template('orderDetails.html')
+
 @app.route('/editOrder/<string:id>')
 def edit_order(id):
     return render_template('editOrder.html', id=id)

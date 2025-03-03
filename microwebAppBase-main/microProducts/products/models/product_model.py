@@ -6,10 +6,10 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    amount = db.Column(db.Integer, default=0)
     price = db.Column(db.Float, nullable=False)
 
-    def __init__(self, name, description, price):
+    def __init__(self, name, amount, price):
         self.name = name
-        self.description = description
+        self.amount = amount
         self.price = price

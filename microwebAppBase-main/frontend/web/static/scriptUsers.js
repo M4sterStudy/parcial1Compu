@@ -165,6 +165,8 @@ function handleLogin(event) {
     .then(data => {
         if (data.message === 'Login successful') {
             console.log("Usuario autenticado:", data);
+            // Guardar el username en sessionStorage
+            sessionStorage.setItem('username', data.username);
             alert("Bienvenido " + data.username);
             window.location.href = '/dashboard';
         } else {
@@ -176,3 +178,20 @@ function handleLogin(event) {
         alert(error.message);
     });
 }
+
+
+// Función para cargar el username en todas las páginas excepto en "/"
+function loadUsername() {
+    const username = sessionStorage.getItem('username');
+    if (username) {
+        console.log("Usuario en sesión:", username);
+
+        // Verificar que no estamos en la ruta "/"
+        if (window.location.pathname !== '/') {
+            document.getElementById('welcome-message').textContent = `Bienvenido, ${username}`;
+        }
+    }
+}
+
+// Llamar a loadUsername cuando cargue la página
+window.onload = loadUsername;

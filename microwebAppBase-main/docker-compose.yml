@@ -61,7 +61,6 @@ services:
     networks:
       - mynetwork
 
-  i
 
   # Frontend con Flask
   frontend:
