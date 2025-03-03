@@ -19,6 +19,22 @@ def get_users():
         })
     return jsonify(result), 200
 
+@user_controller.route('/api/users/<string:username>', methods=['GET'])
+def get_user_by_username(username):
+    print(f"Obteniendo usuario con username: {username}")
+    user = Users.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({'message': 'Usuario no encontrado'}), 404
+
+    return jsonify({
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'username': user.username
+    }), 200
+
+
 @user_controller.route('/api/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     print("obteniendo usuario")

@@ -3,8 +3,12 @@ from flask import Blueprint, request, jsonify
 from orders.models.order_model import Order
 from db.db import db
 import requests
+from flask_cors import CORS
 
 order_controller = Blueprint('order_controller', __name__)
+
+# Habilitar CORS después de definir el Blueprint
+CORS(order_controller, supports_credentials=True)
 
 # URL de los microservicios
 PRODUCTS_API_URL = "http://192.168.100.3:5003/api/products"
@@ -80,14 +84,17 @@ def create_order():
         return jsonify({'message': 'Información de usuario inválida'}), 400
 
     # 3.2 Obtener el email desde microUsers
-    user_response = requests.get(f"{USERS_API_URL}?username={user_name}")
+    user_response = requests.get(f"{USERS_API_URL}/{user_name}")  # Se usa el nuevo endpoint
+
     if user_response.status_code != 200:
         return jsonify({'message': 'Usuario no encontrado en microUsers'}), 400
 
-    user_data = user_response.json()
+    user_data = user_response.json()  # Ahora es un solo usuario, no una lista
     user_email = user_data.get('email')
+
     if not user_email:
         return jsonify({'message': 'No se pudo obtener el email del usuario'}), 400
+
 
     # 3.3 Validar lista de productos
     products = data.get('products')

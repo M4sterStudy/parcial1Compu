@@ -6,26 +6,14 @@
   <title>Order Management</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
-    body {
-      padding-top: 50px;
-      padding-bottom: 20px;
-    }
-    .navbar {
-      margin-bottom: 20px;
-    }
-    .form-container {
-      max-width: 700px; /* un poco más ancho para la tabla */
-      margin: 0 auto;
-    }
+    body { padding-top: 50px; padding-bottom: 20px; }
+    .navbar { margin-bottom: 20px; }
+    .form-container { max-width: 700px; margin: 0 auto; }
   </style>
 </head>
-<body onload="getProducts(); getOrders();">
+<body>
   <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="/">Store Management</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-      aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
   </nav>
 
   <div class="container">
@@ -43,13 +31,25 @@
               <th>Quantity</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- Aquí se insertarán los productos dinámicamente -->
+          </tbody>
         </table>
-        <button type="submit" class="btn btn-success">
-          Create Order
-        </button>
+        <button type="submit" class="btn btn-success">Create Order</button>
       </form>
     </div>
+
+<br>
+
+<!-- Botón para ver solo las órdenes del usuario autenticado -->
+<button id="user-orders-btn" class="btn btn-info" onclick="getUserOrders()">
+  Ver Mis Órdenes
+</button>
+
+<!-- Botón para ver solo las órdenes del usuario autenticado -->
+<button id="orders-btn" class="btn btn-info" onclick="getOrders()">
+  Ver todas las Órdenes
+</button>
 
     <!-- Sección para mostrar todas las órdenes creadas -->
     <h2>Orders List</h2>
@@ -70,6 +70,5 @@
 
   <!-- scriptOrders.js gestiona todo: obtener productos, crear órdenes, listar/eliminar órdenes, etc. -->
   <script src="/static/scriptOrders.js"></script>
-  <script src="/static/scriptUsers.js"></script>
 </body>
 </html>

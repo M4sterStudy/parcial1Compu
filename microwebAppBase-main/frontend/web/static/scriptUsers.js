@@ -185,11 +185,6 @@ function loadUsername() {
     const username = sessionStorage.getItem('username');
     if (username) {
         console.log("Usuario en sesión:", username);
-
-        // Verificar que no estamos en la ruta "/"
-        if (window.location.pathname !== '/') {
-            document.getElementById('welcome-message').textContent = `Bienvenido, ${username}`;
-        }
     }
 }
 

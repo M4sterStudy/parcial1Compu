@@ -1,14 +1,21 @@
 // frontend/web/static/scriptOrders.js
 
 // 0. Obtener productos a través del microOrders (que internamente llama a microProducts)
+// Obtener productos desde microOrders (que a su vez consulta microProducts)
 function getProducts() {
     fetch("http://192.168.100.3:5004/api/orders/products")
     .then(response => response.json())
     .then(data => {
-        console.log("Productos obtenidos desde microOrders:", data);
+        console.log("Productos obtenidos desde microOrders:", data); // Depuración
 
         const productListBody = document.querySelector("#product-list tbody");
         productListBody.innerHTML = ""; // Limpiar registros previos
+
+        if (!Array.isArray(data) || data.length === 0) {
+            console.warn("No hay productos disponibles.");
+            productListBody.innerHTML = `<tr><td colspan="5" class="text-center">No hay productos disponibles</td></tr>`;
+            return;
+        }
 
         data.forEach(product => {
             const row = document.createElement("tr");
@@ -46,7 +53,11 @@ function getProducts() {
             productListBody.appendChild(row);
         });
     })
-    .catch(error => console.error("Error al obtener productos desde microOrders:", error));
+    .catch(error => {
+        console.error("Error al obtener productos desde microOrders:", error);
+        const productListBody = document.querySelector("#product-list tbody");
+        productListBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error al cargar productos</td></tr>`;
+    });
 }
 
 // 1. Crear una nueva orden (POST)
@@ -104,6 +115,7 @@ function createOrder() {
             // Mostrar el total local. El backend pudo calcular uno ligeramente distinto si los datos cambian.
             alert(`¡Orden creada exitosamente! Total calculado (frontend): $${saleTotal.toFixed(2)}`);
             getOrders(); // Recargar la lista de órdenes
+            getProducts(); // Recargar la lista de Productos.
         } else {
             console.error('Error al crear la orden:', data.message);
             alert('Error al crear la orden. Por favor, intenta nuevamente.');
@@ -156,13 +168,6 @@ function getOrders() {
             // Acciones (Ver detalles, Eliminar)
             const actionsCell = document.createElement("td");
 
-            // Botón para ver detalles
-            const viewDetailsLink = document.createElement("a");
-            viewDetailsLink.href = `/orderDetails/${order.id}`;
-            viewDetailsLink.textContent = "Ver Detalles";
-            viewDetailsLink.className = "btn btn-info mr-2";
-            actionsCell.appendChild(viewDetailsLink);
-
             // Botón para eliminar
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Eliminar";
@@ -214,3 +219,93 @@ function deleteOrder(orderId) {
         });
     }
 }
+
+// Obtener órdenes solo del usuario autenticado
+function getUserOrders() {
+    const username = sessionStorage.getItem('username');
+    if (!username) {
+        alert("Error: No hay un usuario autenticado.");
+        return;
+    }
+
+    fetch("http://192.168.100.3:5004/api/orders")
+    .then(response => response.json())
+    .then(data => {
+        console.log("Órdenes recibidas:", data);
+
+        // Filtrar solo las órdenes del usuario autenticado
+        const userOrders = data.filter(order => order.username === username);
+
+        const ordersListBody = document.querySelector("#orders-list tbody");
+        ordersListBody.innerHTML = ""; // Limpiar registros previos
+
+        if (userOrders.length === 0) {
+            ordersListBody.innerHTML = `<tr><td colspan="6" class="text-center">No tienes órdenes registradas</td></tr>`;
+            return;
+        }
+
+        userOrders.forEach(order => {
+            const row = document.createElement("tr");
+
+            // ID de la orden
+            const idCell = document.createElement("td");
+            idCell.textContent = order.id;
+            row.appendChild(idCell);
+
+            // Nombre de usuario
+            const userCell = document.createElement("td");
+            userCell.textContent = order.username;
+            row.appendChild(userCell);
+
+            // Email
+            const emailCell = document.createElement("td");
+            emailCell.textContent = order.email;
+            row.appendChild(emailCell);
+
+            // Total de la orden
+            const totalCell = document.createElement("td");
+            totalCell.textContent = `$${parseFloat(order.saleTotal).toFixed(2)}`;
+            row.appendChild(totalCell);
+
+            // Fecha de la orden
+            const dateCell = document.createElement("td");
+            dateCell.textContent = order.date;
+            row.appendChild(dateCell);
+
+            // Acciones (Botón eliminar)
+            const actionsCell = document.createElement("td"); // ✅ Definir actionsCell antes de usarlo
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Eliminar";
+            deleteButton.className = "btn btn-danger";
+            deleteButton.onclick = () => {
+                deleteOrder(order.id);
+            };
+
+            actionsCell.appendChild(deleteButton);
+            row.appendChild(actionsCell); // ✅ Ahora actionsCell existe antes de agregarlo a la fila
+
+            ordersListBody.appendChild(row);
+        });
+    })
+    .catch(error => console.error("Error al obtener órdenes del usuario:", error));
+}
+
+
+// Función para cargar el username en todas las páginas excepto en "/"
+function loadUsername() {
+    const username = sessionStorage.getItem('username');
+    if (username) {
+        console.log("Usuario en sesión:", username);
+    } else {
+        console.warn("No hay usuario en sesión. Redirigiendo al login...");
+        window.location.href = "/login"; // Redirigir si no hay usuario autenticado
+    }
+}
+
+// Ejecutar todas las funciones necesarias cuando la página cargue
+window.addEventListener("load", function () {
+    loadUsername();
+    getProducts();
+    getOrders();
+});
+

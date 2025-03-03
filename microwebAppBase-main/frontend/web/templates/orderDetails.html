@@ -39,10 +39,14 @@
 
   <script src="/static/scriptOrders.js"></script>
   <script>
-    // Tomar el ID de la orden desde Flask
-    const orderId = "{{ id }}";
-    // Cargar datos de la orden al iniciar la página
-    getOrder(orderId);
+    document.addEventListener("DOMContentLoaded", function () {
+      const orderId = "{{ id }}";  // Tomar el ID de la orden desde Flask
+      if (orderId) {
+        getOrder(orderId);
+      } else {
+        console.error("Error: No se recibió un ID de orden.");
+      }
+    });
   </script>
 </body>
 </html>
