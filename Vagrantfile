@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
 
   # Definimos la máquina servidorUbuntu con la nueva box pública
   config.vm.define :servidorUbuntu do |servidorUbuntu|
-    servidorUbuntu.vm.box = "Parcial1/ServidorUbuntu"
+    servidorUbuntu.vm.box = "Parcial1/ServidorUbuntu2"
     servidorUbuntu.vm.box_version = "0.0.1"
     servidorUbuntu.vm.network :private_network, ip: "192.168.100.3"
     servidorUbuntu.vm.hostname = "servidorUbuntu"
@@ -21,6 +21,5 @@ Vagrant.configure("2") do |config|
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/microUsers",     "/home/vagrant/microwebAppBase-main/microUsers"
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/microProducts",  "/home/vagrant/microwebAppBase-main/microProducts"
     servidorUbuntu.vm.synced_folder "microwebAppBase-main/microOrders",   "/home/vagrant/microwebAppBase-main/microOrders"
-    #servidorUbuntu.vm.synced_folder "microwebAppBase-main/init.sql",      "/home/vagrant/microwebAppBase-main/init.sql"
   end
 end
